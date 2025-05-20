@@ -1,11 +1,13 @@
 import Checkoperatorid from  '../lib/Checkoperatorid.js';
 import Checkpenghunidb from '../lib/Checkpenghunidb.js';
 import Insertpenghunidb from '../lib/Insertpenghunidb.js';
+import applyCors from "../lib/cors.js"; 
 import jwt from 'jsonwebtoken';
 import  'dotenv/config';
 
 
 export default async function handler(req, res) {
+if (applyCors(req, res)) return; 
 
 const { nama, tempatlahir, tgllahir, noktp, nohp, tower, unit, status, periodsewa, agen, emergencyhp,
 pemilikunit } = req.body;

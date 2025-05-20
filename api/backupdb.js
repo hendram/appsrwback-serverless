@@ -1,5 +1,7 @@
+import applyCors from "../lib/cors.js"; 
 
 export default async function handler(req, res) {
+  if (applyCors(req, res)) return; 
 
    if(req.body.backup === "ok") {
     const spawnvar = spawn('../lib/Backupscript.sh', 

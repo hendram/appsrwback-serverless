@@ -1,10 +1,12 @@
 import Checkoperatorid from '../lib/Checkoperatorid.js';
 import Fetchallpenghuniunitdb from '../lib/Fetchallpenghuniunitdb.js';
+import applyCors from "../lib/cors.js"; 
 import jwt from 'jsonwebtoken';
 import  'dotenv/config';
 
 
 export default async function handler(req, res) {
+ if (applyCors(req, res)) return; 
 
 const { tower, unit, lowlimit, highlimit } = req.body;
 

@@ -1,5 +1,6 @@
 import Insertoperatordb from '../lib/Insertoperatordb.js';
 import Checkoperatordb from '../lib/Checkoperatordb.js';
+import applyCors from "../lib/cors.js"; 
 import jwt from 'jsonwebtoken';
 import  'dotenv/config';
 
@@ -11,6 +12,8 @@ password: "123456"
 }];
 
 export default async function handler(req, res) {
+if (applyCors(req, res)) return; 
+
 const { operatorname, invite } = req.body;
 const token = req.headers.authorization;
 

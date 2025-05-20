@@ -1,6 +1,7 @@
 import Checkoperatordb from '../lib/Checkoperatordb.js'; 
 import Checkoperatorsignindb from '../lib/Checkoperatorsignindb.js';
 import Updateoperatordb from '../lib/Updateoperatordb.js';
+import applyCors from "../lib/cors.js";
 import jwt from 'jsonwebtoken';
 import  'dotenv/config';
 
@@ -14,6 +15,9 @@ password: "123456"
 
 
 export default async function handler(req, res) {
+
+  if (applyCors(req, res)) return; 
+
   const {operatorname, password, invite} = req.body;
 
 if(operatorname && password && invite) {

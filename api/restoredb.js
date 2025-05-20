@@ -1,4 +1,7 @@
+import applyCors from "../lib/cors.js";
+
 export default async function handler(req, res) {
+if (applyCors(req, res)) return; 
 
 // Create a writable stream to the desired file location
   const fileStream = fs.createWriteStream('../lib/greenbay.zip');
