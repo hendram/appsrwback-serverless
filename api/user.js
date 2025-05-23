@@ -3,57 +3,62 @@ import Checkoperatorsignindb from '../lib/Checkoperatorsignindb.js';
 import Updateoperatordb from '../lib/Updateoperatordb.js';
 import applyCors from "../lib/cors.js";
 import jwt from 'jsonwebtoken';
-import  'dotenv/config';
-
+import 'dotenv/config';
 
 const admin = [{
-id: 1,
-username: "admin",
-password: "123456"
+  id: 1,
+  username: "admin",
+  password: "123456"
 }];
 
-
-
 export default async function handler(req, res) {
+  if (applyCors(req, res)) return;
 
-  if (applyCors(req, res)) return; 
+  const { operatorname, password, invite } = req.body;
 
-  const {operatorname, password, invite} = req.body;
+  try {
+    if (operatorname && password && invite) {
+      let result = await Checkoperatordb(operatorname, invite);
+      if (result) {
+        let updateResult = await Updateoperatordb(operatorname, password, invite);
+        if (updateResult === "1updated") {
+          const token = jwt.sign(
+            { id: result._id, role: "user" },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+          );
+          return res.json({ token });
+        }
+      }
+      return res.json({ kosong: "" });
+    }
 
-if(operatorname && password && invite) {
-     let resultnya = await Checkoperatordb(operatorname,
-           invite);
-                if(resultnya){
-   let resultnya2 = await Updateoperatordb(operatorname, password,
-invite);
-     if(resultnya2 === "1updated"){
-       const tokenu = jwt.sign({id: resultnya._id}, process.env.JWT_SECRET);
-         res.json({tokenu});
-}
-       else {
-          res.send({kosong: ""});
-       }
-}
-}
+    const foundAdmin = admin.find(
+      a => a.username === operatorname && a.password === password
+    );
 
-else {
-        const user = admin.find(a => a.username === operatorname && a.password === password);
-        const token = jwt.sign({ id: admin[0].id}, process.env.JWT_SECRET);
-   if(user){      
-  res.json({token});
-       console.log(user);
-}
-    else {
-     let resultnya = await Checkoperatorsignindb(operatorname,
-          password);
-                if(resultnya){
-       const tokenu = jwt.sign({id: resultnya._id}, process.env.JWT_SECRET);
-	   res.json({tokenu});
-}
-       else {
-          console.log("masuk ke kosong");
-          res.send({kosong: ""});
-       }
-}
-}
+    if (foundAdmin) {
+      const token = jwt.sign(
+        { id: foundAdmin.id, role: "admin" },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      return res.json({ token });
+    }
+
+    const result = await Checkoperatorsignindb(operatorname, password);
+    if (result) {
+      const token = jwt.sign(
+        { id: result._id, role: "user" },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      return res.json({ token });
+    }
+
+    return res.json({ kosong: "" });
+
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 }

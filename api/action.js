@@ -11,15 +11,22 @@ export default async function handler(req, res) {
 const {nama, tempatlahir, tgllahir, noktp, nohp, tower, unit, status, periodsewa, agen, emergencyhp,
 pemilikunit } = req.body;
 
-const tokenu = req.headers.authorization;
-  if(!tokenu) {
+const token = req.headers.authorization;
+  if(!token) {
    return res.status(401).json({message: 'No token provided' });
  }
 else {
  try {
-    const decoded = jwt.verify(tokenu, process.env.JWT_SECRET);
+ const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     const userId = decoded.id;
-    let resultusercheck = await Checkoperatorid(userId);
+    const role = decoded.role;
+
+    if (role !== "user") {
+      return res.status(403).json({ message: 'Only users are allowed to update data here' });
+    }
+
+ let resultusercheck = await Checkoperatorid(userId);
         if(resultusercheck){
 
  if(nama && tempatlahir && tgllahir && noktp && nohp &&

@@ -22,18 +22,23 @@ const token = req.headers.authorization;
  }
 else {
  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+ const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     const userId = decoded.id;
+    const role = decoded.role;
+
+    if (role !== "admin") {
+      return res.status(403).json({ message: 'Only users are allowed to update data here' });
+    }
 
 
     // Find the user by ID
-     if(Number(admin[0].id) === Number(userId)){
+     if((Number(admin[0].id) === Number(userId)) && role === "admin"){
   if(operatorname && invite){
               let resultnya = await Checkoperatordb(operatorname,
            invite);
                 if(resultnya === "notfind"){
                    let resultnya2 = await Insertoperatordb(operatorname, invite);
-          console.log("sampai notfindnya");
               if(resultnya2 === "1inserted"){
                        res.send({answer: "ok"});
     }
@@ -48,7 +53,6 @@ else {
 else if(operatorname){
      let resultnya = await Deleteoperatordb(operatorname);
             if(resultnya === "1deleted"){
-          console.log("dah didelete ini operatornya");
              res.send({answer: "ok"});
     }
 }
